@@ -19,3 +19,4 @@ class TransaccionesEditar(TransaccionesBase):
 class Transacciones(TransaccionesBase):
     id: int | None = None
     factura_id: int | None = None
+    

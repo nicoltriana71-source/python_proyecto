@@ -2,9 +2,9 @@ from datetime import datetime
 from fastapi.responses import JSONResponse
 
 from fastapi import FastAPI, HTTPException
-from modelos.clientes import Cliente, ClienteCrear, ClienteEditar, ClienteEliminar
-from modelos.facturas import Factura, FacturaCrear, FacturaEditar
-from modelos.transacciones import Transacciones, TransaccionesCrear, TransaccionesEditar
+from app.modelos.clientes import Cliente, ClienteCrear, ClienteEditar, ClienteEliminar
+from app.modelos.facturas import Factura, FacturaCrear, FacturaEditar
+from app.modelos.transacciones import Transacciones, TransaccionesCrear, TransaccionesEditar
 
 
 app = FastAPI()
@@ -33,7 +33,6 @@ async def listar_cliente(id:int):
     
 
 #CREAR CLIENTES
-
 
 @app.post("/clientes", response_model=Cliente)
 async def crear_clientes(datos_cliente:ClienteCrear):
@@ -66,10 +65,12 @@ async def eliminar_clientes(id:int, datos_cliente:ClienteEliminar):
 
 #CRUD FACTURAS
 
+#LISTAR FACTURAS
 @app.get("/facturas", response_model=list[Factura])
 async def listar_facturas():
     return lista_facturas
 
+#CREAR CLIENTES
 @app.post("/facturas/{cliente_id}", response_model=Factura, status_code=201)
 async def crear_facturas(cliente_id: int, datos_factura: FacturaCrear):
     cliente_encontrado = None
@@ -91,26 +92,41 @@ async def crear_facturas(cliente_id: int, datos_factura: FacturaCrear):
     lista_facturas.append(factura_val)
     return factura_val
 
-
+#EDITAR FACTURA
 @app.put("/facturas/{id}", response_model=Factura)
 async def editar_factura(id: int, datos_factura: FacturaEditar):
+
     factura_encontrada = None
+
     for factura in lista_facturas:
         if factura.id == id:
             factura_encontrada = factura
             break
-        
+
     if not factura_encontrada:
         raise HTTPException(
             status_code=404,
             detail=f"Factura con id {id} no encontrada"
         )
-        
-    factura_encontrada.total = datos_factura.total
-    factura_encontrada.descripcion = datos_factura.descripcion
+
+    cliente_encontrado = None
+
+    for cliente in lista_clientes:
+        if cliente.id == datos_factura.cliente_id:
+            cliente_encontrado = cliente
+            break
+
+    if not cliente_encontrado:
+        raise HTTPException(
+            status_code=404,
+            detail=f"Cliente con id {datos_factura.cliente_id} no encontrado"
+        )
+
+    factura_encontrada.cliente = cliente_encontrado
 
     return factura_encontrada
 
+#ELIMINAR FACTURA
 @app.delete("/facturas/{id}")
 async def eliminar_factura(id: int):
     for i, obj_factura in enumerate(lista_facturas):
@@ -208,7 +224,7 @@ async def editar_transaccion(id: int,transacciones_id: int, datos_transaccion:Tr
             t.vr_unitario = datos_transaccion.vr_unitario
             t.descripcion = datos_transaccion.descripcion
             
-            factura.total = factura.calcular_total()
+            factura.total = factura.valor_total
             return {"mensaje": "Transaccion actualizada", "factura": factura}
         
     return {"mensaje": "transaccion no encontrada"}
@@ -226,7 +242,7 @@ async def eliminar_transacciones(id: int, transacciones_id: int):
     for t in factura.transacciones:
         if t.id == transacciones_id:
             factura.transacciones.remove(t)
-            factura.tortal = factura.calcular_total()
+            factura.total = factura.valor_total
             return {"mensaje": "transaccuion eliminada", "factura": factura}
         
     return {"mensaje": "Transaccion no encontrada"}

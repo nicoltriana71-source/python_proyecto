@@ -1,7 +1,7 @@
 from pydantic import BaseModel, computed_field
 
-from modelos.clientes import Cliente
-from modelos.transacciones import Transacciones
+from app.modelos.clientes import Cliente
+from app.modelos.transacciones import Transacciones
 
 class FacturaBase(BaseModel):
     # atributos
@@ -25,7 +25,7 @@ class FacturaCrear(FacturaBase):
     cliente_id: int
 
 
-class FacturaEditar(FacturaBase):
+class FacturaEditar(BaseModel):
     cliente_id: int
 
 
