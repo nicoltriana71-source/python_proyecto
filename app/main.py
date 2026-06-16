@@ -2,15 +2,13 @@ from datetime import datetime
 from fastapi.responses import JSONResponse
 
 from fastapi import FastAPI, HTTPException
-from .modelos.clientes import Cliente, ClienteCrear, ClienteEditar, ClienteEliminar
-from .modelos.facturas import Factura, FacturaCrear, FacturaEditar
-from .modelos.transacciones import Transacciones, TransaccionesCrear, TransaccionesEditar
 from .enrutador import clientes
 from .enrutador import facturas
 from .enrutador import transacciones
+from .conexion_bd import crear_tablas
 
 
-app = FastAPI()
+app = FastAPI(lifespan=crear_tablas)
 
 
 #SE INCLUYE RUTA DE CLIENTES 

@@ -1,6 +1,7 @@
 from fastapi import APIRouter
 from ..modelos.clientes import  Cliente, ClienteCrear, ClienteEditar, ClienteEliminar
 from ..listas import lista_clientes
+from ..conexion_bd import Sesion_dependencia
 
 rutas_clientes = APIRouter()
 
@@ -16,9 +17,9 @@ async def listar_cliente():
     else:
         return{"No existen clientes"}
     
-
+#LISTAR CLIENTES POR ID
 @rutas_clientes.get("/clientes/{id}")
-async def listar_cliente(id:int):
+async def listar_cliente(id:int, mi_sesion: Sesion_dependencia):
     for cliente in lista_clientes:
         if cliente.id == id:
             return cliente
@@ -28,11 +29,11 @@ async def listar_cliente(id:int):
 #CREAR CLIENTES
 
 @rutas_clientes.post("/clientes", response_model=Cliente)
-async def crear_clientes(datos_cliente:ClienteCrear):
+async def crear_clientes(datos_cliente:ClienteCrear, mi_sesion: Sesion_dependencia):
     Cliente_val = Cliente.model_validate(datos_cliente.model_dump())
-    Cliente_val.id = len (lista_clientes) +1  #incremento de id
-    lista_clientes.append(Cliente_val)
-#    return {"Clientes": Cliente_val}
+    mi_sesion.add(Cliente_val)
+    mi_sesion.commit()
+    mi_sesion.refresh(Cliente_val)
     return Cliente_val
 
 
