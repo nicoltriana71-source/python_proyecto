@@ -16,3 +16,4 @@ class ClienteEliminar(ClienteBase):
 
 class Cliente(ClienteBase):
     id: int | None = None
+    
