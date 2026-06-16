@@ -1,9 +1,8 @@
 from fastapi import APIRouter
-
 from ..modelos.clientes import  Cliente, ClienteCrear, ClienteEditar, ClienteEliminar
+from ..listas import lista_clientes
 
 rutas_clientes = APIRouter()
-lista_clientes: list[Cliente] = []
 
 
 #CRUD CLIENTES

@@ -5,10 +5,11 @@ from ..modelos.transacciones import Transacciones, TransaccionesCrear, Transacci
 from ..modelos.facturas import Factura, FacturaCrear
 from .clientes import lista_clientes
 from .facturas import lista_facturas
+from ..listas import lista_clientes, lista_facturas, lista_transacciones
 
 
 rutas_transacciones = APIRouter()
-lista_transacciones: list[Transacciones] = []
+
 
 #CRUD TRANSACCIONES 
 

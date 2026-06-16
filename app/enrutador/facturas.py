@@ -2,10 +2,10 @@ from fastapi import APIRouter, HTTPException
 from datetime import datetime
 
 from ..modelos.facturas import Factura, FacturaCrear, FacturaEditar
-from .clientes import lista_clientes
+from ..listas import lista_facturas, lista_clientes
 
 rutas_facturas = APIRouter()
-lista_facturas: list[Factura] = []
+
 
 #CRUD FACTURAS
 
@@ -18,7 +18,7 @@ async def listar_facturas():
 @rutas_facturas.post("/facturas/{cliente_id}", response_model=Factura, status_code=201)
 async def crear_facturas(cliente_id: int, datos_factura: FacturaCrear):
     
-    print("CLIENTES REGISTRADOS:", lista_clientes)
+    print("LISTA CLIENTES FACTURAS:", lista_clientes)
     
     cliente_encontrado = None
     

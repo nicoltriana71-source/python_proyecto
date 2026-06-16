@@ -10,13 +10,8 @@ from .enrutador import facturas
 from .enrutador import transacciones
 
 
-
-
 app = FastAPI()
 
-lista_clientes:list [Cliente] = []
-lista_facturas: list[Factura] = []
-lista_transacciones: list[Transacciones] = []
 
 #SE INCLUYE RUTA DE CLIENTES 
 app.include_router(clientes.rutas_clientes, tags=["Clientes"])

@@ -17,4 +17,6 @@ Consiste ene le desarrollo de una API REST que utiliza FastAPI para gestionar Cl
 5.Se creo la CRUD de factura y relaciones 
 6.Se creo la CRUD de transacciones y relaciones 
 7.Se subieron los cambios con sus respectivos commits al repositorio 
+8.Se realizo la creacion de las rutas de clientes, facturas y transacciones 
+
 
