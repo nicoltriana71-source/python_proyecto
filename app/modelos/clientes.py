@@ -2,9 +2,9 @@ from pydantic import BaseModel
 from sqlmodel import  SQLModel, Field, Relationship
 
 class ClienteBase(SQLModel):
-    nombre: str
-    edad: int
-    descripcion: str | None
+    nombre: str = Field(default=None)
+    edad: int = Field(default=None)
+    descripcion: str | None = Field(default=None)
     
 class ClienteCrear(ClienteBase):
     pass

@@ -1,7 +1,8 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, HTTPException, status
 from ..modelos.clientes import  Cliente, ClienteCrear, ClienteEditar, ClienteEliminar
 from ..listas import lista_clientes
 from ..conexion_bd import Sesion_dependencia
+from sqlmodel import select
 
 rutas_clientes = APIRouter()
 
@@ -10,21 +11,17 @@ rutas_clientes = APIRouter()
 
 #LISTAR CLIENTES
 @rutas_clientes.get("/clientes")
-async def listar_cliente():
-    #creacion de sms mas adecuado al usuario
-    if len(lista_clientes) > 0:
-       return{"Existen clientes": lista_clientes}
-    else:
-        return{"No existen clientes"}
+async def listar_cliente(mi_sesion: Sesion_dependencia):
+    cliente_lis = mi_sesion.exec(select(Cliente)).all()
+    return cliente_lis
     
 #LISTAR CLIENTES POR ID
 @rutas_clientes.get("/clientes/{id}")
 async def listar_cliente(id:int, mi_sesion: Sesion_dependencia):
-    for cliente in lista_clientes:
-        if cliente.id == id:
-            return cliente
-
-    
+    cliente_list = mi_sesion.get(Cliente, id)
+    if not cliente_list:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f"Cliente no encontrado con el ID {id}")
+    return cliente_list
 
 #CREAR CLIENTES
 
@@ -39,20 +36,29 @@ async def crear_clientes(datos_cliente:ClienteCrear, mi_sesion: Sesion_dependenc
 
 #EDITAR CLIENTES 
 @rutas_clientes.put("/cliente/{id}")
-async def editar_clientes(id:int, datos_cliente:ClienteEditar):
-    for i, obj_cliente in enumerate(lista_clientes):
-        if obj_cliente.id == id:
-            cliente_val = Cliente.model_validate(datos_cliente.model_dump())
-            cliente_val.id = id
-            lista_clientes[i] = cliente_val
+async def editar_clientes(id:int, datos_cliente:ClienteEditar, mi_sesion: Sesion_dependencia):
+    cliente_bd = mi_sesion.get(Cliente, id)
+
+    if not cliente_bd:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f"El cliente conID {id}, no existe")
+    cliente_dict = datos_cliente.model_dump(exclude_unset=True)
+    cliente_bd.sqlmodel_update(cliente_dict)
+    mi_sesion.add(cliente_bd)
+    mi_sesion.commit()
+    mi_sesion.refresh(cliente_bd)
              
-    return {"mensaje": "Se acualizo correctamente el cliente", "Cliente": cliente_val}
+    return cliente_bd
 
 
 #ELIMINAR CLIENTES 
 @rutas_clientes.delete("/cliente/{id}")
-async def eliminar_clientes(id:int, datos_cliente:ClienteEliminar):
-    for i, obj_cliente in enumerate(lista_clientes):
-        if obj_cliente.id == id:
-            cliente_eliminado = lista_clientes.pop(i)
-    return {"Cliente": "Cliente elminado", "Cliente": cliente_eliminado}
+async def eliminar_clientes(id:int, datos_cliente:ClienteEliminar, mi_sesion: Sesion_dependencia):
+    cliente_bd = mi_sesion.get(Cliente, id)
+
+    if not cliente_bd:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f"El cliente conID {id}, no existe")
+    cliente_dict = datos_cliente.model_dump(exclude_unset=True)
+    cliente_bd.sqlmodel_update(cliente_dict)
+    mi_sesion.delete(cliente_bd)
+    mi_sesion.commit()
+    return cliente_bd
