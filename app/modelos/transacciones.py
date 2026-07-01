@@ -4,7 +4,7 @@ class TransaccionesBase(SQLModel):
     # atributos
     cantidad: int=Field(default=0)
     vr_unitario: float= Field(default=0.0)
-    descripcion: str
+    descripcion: str = Field(default=None)
 
 
 class TransaccionesCrear(TransaccionesBase):
