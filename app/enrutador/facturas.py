@@ -1,7 +1,7 @@
 from fastapi import APIRouter, HTTPException
 from datetime import datetime
 
-from ..modelos.facturas import Factura, FacturaCrear, FacturaEditar
+from ..modelos.facturas import Factura, FacturaCrear, FacturaEditar, FacturaLeer
 from ..listas import lista_facturas, lista_clientes
 from..conexion_bd import Sesion_dependencia
 from sqlmodel import select
@@ -13,7 +13,7 @@ rutas_facturas = APIRouter()
 #CRUD FACTURAS
 
 #LISTAR FACTURAS
-@rutas_facturas.get("/facturas", response_model=list[Factura])
+@rutas_facturas.get("/facturas", response_model=list[FacturaLeer])
 async def listar_facturas(sesion: Sesion_dependencia):
     #select * from factura
     consulta = select(Factura)
